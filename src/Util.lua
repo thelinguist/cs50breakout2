@@ -22,10 +22,19 @@ function table.slice(tbl, first, last, step)
 
     -- for the first one you want (or first one in index) until the last or the table end, step 1 in the loop (or step var)
     for i = first or 1, last or #tbl, step or 1 do -- # equals size of table
-        sliced[#slice+1] = tbl[i]
+        sliced[#sliced+1] = tbl[i]
     end
 
     return sliced
+end
+
+--[[
+    This function is specifically made to piece out the bricks from the
+    sprite sheet. Since the sprite sheet has non-uniform sprites within,
+    we have to return a subset of GenerateQuads.
+]]
+function GenerateQuadsBricks(atlas)
+    return table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
 end
 
 
