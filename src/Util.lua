@@ -1,3 +1,5 @@
+-- this file helps us go over the sprite sheet and load graphics
+
 -- look at the sprite sheet and get a table of all our images iterating thru tiles
 function GenerateQuads(atlas, tilewidth, tileheight)
     local sheetWidth = atlas:getWidth() / tilewidth
