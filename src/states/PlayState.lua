@@ -5,7 +5,9 @@ function PlayState:enter(params)
     self.bricks = params.bricks
     self.health = params.health
     self.score = params.score
+    self.highScores = params.highScores
     self.ball = params.ball
+    self.level = params.level
 
     -- give ball random starting velocity
     self.ball.dx = math.random(-200, 200)
@@ -55,9 +57,22 @@ function PlayState:update(dt)
         if brick.inPlay and self.ball:collides(brick) then
 
             -- add to score
-            self.score = self.score + 10
+            self.score = self.score + (brick.tier * 200 + brick.color * 25)
 
             brick:hit()
+
+            if self:checkVictory() then
+                gSounds['victory']:play()
+
+                gStateMachine:change('victory', {
+                    level = self.level,
+                    paddle = self.paddle,
+                    health = self.health,
+                    score = self.score,
+                    highScores = self.highScores,
+                    ball = self.ball
+                })
+            end
             -- collision code for bricks
             --
             -- we check to see if the opposite side of our velocity is outside of the brick;
@@ -110,17 +125,25 @@ function PlayState:update(dt)
 
         if self.health == 0 then
             gStateMachine:change('game-over', {
-                score = self.score
+                score = self.score,
+                highScores = self.highScores
             })
         else
             gStateMachine:change('serve', {
-                score = self.score,
                 paddle = self.paddle,
                 bricks = self.bricks,
-                health = self.health
+                health = self.health,
+                score = self.score,
+                highScores = self.highScores,
+                level = self.level
             })
         end
 
+    end
+
+    -- for rendering particle systems
+    for k, brick in pairs(self.bricks) do
+        brick:update(dt)
     end
 
     if love.keyboard.wasPressed('escape') then
@@ -135,6 +158,11 @@ function PlayState:render()
         brick:render()
     end
 
+    -- render all particle systems
+    for k, brick in pairs(self.bricks) do
+        brick:renderParticles()
+    end
+
     self.paddle:render()
     self.ball:render()
 
@@ -145,6 +173,15 @@ function PlayState:render()
         love.graphics.setFont(gFonts['large'])
         love.graphics.printf("PAUSED", 0, VIRTUAL_HEIGHT / 2 - 16, VIRTUAL_WIDTH, 'center')
     end
+end
+
+function PlayState:checkVictory()
+    for k, brick in pairs(self.bricks) do
+        if(brick.inPlay) then
+            return false
+        end
+    end
+    return true
 end
 
 
