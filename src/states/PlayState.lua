@@ -8,6 +8,7 @@ function PlayState:enter(params)
     self.highScores = params.highScores
     self.ball = params.ball
     self.level = params.level
+    self.checkpoint = params.checkpoint
 
     -- give ball random starting velocity
     self.ball.dx = math.random(-200, 200)
@@ -58,6 +59,11 @@ function PlayState:update(dt)
 
             -- add to score
             self.score = self.score + (brick.tier * 200 + brick.color * 25)
+            self.checkpoint = self.checkpoint + (brick.tier * 200 + brick.color * 25)
+            if self.checkpoint >= CHANGE_PADDLE_POINTS then
+                self.paddle:changeSize(self.paddle.size + 1)
+                self.checkpoint = self.checkpoint - CHANGE_PADDLE_POINTS
+            end
 
             brick:hit()
 
@@ -70,7 +76,8 @@ function PlayState:update(dt)
                     health = self.health,
                     score = self.score,
                     highScores = self.highScores,
-                    ball = self.ball
+                    ball = self.ball,
+                    checkpoint = self.checkpoint
                 })
             end
             -- collision code for bricks
@@ -129,13 +136,15 @@ function PlayState:update(dt)
                 highScores = self.highScores
             })
         else
+            self.paddle:changeSize(self.paddle.size - 1)
             gStateMachine:change('serve', {
                 paddle = self.paddle,
                 bricks = self.bricks,
                 health = self.health,
                 score = self.score,
                 highScores = self.highScores,
-                level = self.level
+                level = self.level,
+                checkpoint = self.checkpoint
             })
         end
 
