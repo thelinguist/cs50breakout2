@@ -42,7 +42,10 @@ function StartState:update(dt)
                 score = 0,
                 highScores = self.highScores,
                 level = 1,
-                checkpoint = 0,
+                pointsCounters = {
+                    checkpoint = 0,
+                    powerup = randomPowerupTime()
+                },
             })
         else
             gStateMachine:change('high-scores', {

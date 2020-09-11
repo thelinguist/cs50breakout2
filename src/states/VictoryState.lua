@@ -38,7 +38,10 @@ function VictoryState:update(dt)
             health = self.health,
             score = self.score,
             highScores = self.highScores,
-            checkpoint = 0
+            pointsCounters = {
+                checkpoint = 0,
+                powerup = randomPowerupTime()
+            }
         })
     end
 end
