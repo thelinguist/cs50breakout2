@@ -15,7 +15,7 @@ BRICK_WIDTH = 32
 function LevelMaker.createMap(level, lockedBrickFlag)
     local bricks = {}
 
-    local numRows = math.random(1,5)
+    local numRows = TESTING and 1 or math.random(1,5)
 
     -- randomly choose the number of columns, ensuring odd
     local numCols = math.random(7, 13)
@@ -103,7 +103,7 @@ function LevelMaker.createMap(level, lockedBrickFlag)
     if lockedBrickFlag then
         local i = math.random(1,#bricks)
         bricks[i].isLocked = true
-        bricks[i].tier = 0
+        bricks[i].tier = 1
         bricks[i].color = 6
     end
 

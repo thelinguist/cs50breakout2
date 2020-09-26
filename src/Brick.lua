@@ -43,7 +43,7 @@ paletteColors = {
     }
 }
 
-function Brick:init(x, y)
+function Brick:init(x, y, isLocked)
     self.tier = 0
     self.color = 1
 
@@ -52,7 +52,7 @@ function Brick:init(x, y)
     self.width = 32
     self.height = 16
 
-    self.isLocked = false
+    self.isLocked = isLocked
     self.inPlay = true
 
     -- particle system belonging to the brick, emitted on hit
@@ -78,7 +78,7 @@ function Brick:update(dt)
 end
 
 function Brick:hit(withKey)
-    if not isLocked or withKey then
+    if not self.isLocked or withKey then
         -- set the particle system to interpolate between two colors; in this case, we give
         -- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
         -- over the particle's lifetime (the second color)
@@ -100,7 +100,10 @@ function Brick:hit(withKey)
 
         -- if we're at a higher tier than the base, we need to go down a tier
         -- if we're already at the lowest color, else just go down a color
-        if self.tier > 0 then
+        if self.isLocked and withKey then
+            self.isLocked = false
+            self.tier = 0
+        elseif self.tier > 0 then
             if self.color == 1 then
                 self.tier = self.tier - 1
                 self.color = 5
@@ -108,8 +111,8 @@ function Brick:hit(withKey)
                 self.color = self.color - 1
             end
         else
-            -- if we're in the first tier and the base color, remove brick from play
-            if self.color == 1 then
+            -- if we're in the first tier and the base color, or have the lockedBrick color remove brick from play
+            if self.color == 1 or self.color == 6 then
                 self.inPlay = false
             else
                 self.color = self.color - 1

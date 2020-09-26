@@ -23,3 +23,5 @@ PADDLE_SPEED = 200
 
 -- required points to earn between paddle upgrades
 CHANGE_PADDLE_POINTS = 1000
+
+TESTING = false
