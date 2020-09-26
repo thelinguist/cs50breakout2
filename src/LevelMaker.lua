@@ -10,8 +10,9 @@ SOLID = 1           -- all colors the same in this row
 ALTERNATE = 2       -- alternate colors
 SKIP = 3            -- skip every other block
 NONE = 4            -- no blocks this row
+BRICK_WIDTH = 32
 
-function LevelMaker.createMap(level)
+function LevelMaker.createMap(level, lockedBrickFlag)
     local bricks = {}
 
     local numRows = math.random(1,5)
@@ -68,7 +69,7 @@ function LevelMaker.createMap(level)
 
             b = Brick(
                     (x-1)                   -- zero index it
-                    * 32                    -- multiply by brick width
+                    * BRICK_WIDTH           -- multiply by brick width
                     + 8                     -- plus padding
                     + (13 - numCols) * 16,  -- left side padding when there are 13
                     y * 16
@@ -96,6 +97,14 @@ function LevelMaker.createMap(level)
             -- Lua's version of the 'continue' statement
             ::continue::
         end
+    end
+
+    -- use locked brick less often. Replace a brick with lockedBrick
+    if lockedBrickFlag then
+        local i = math.random(1,#bricks)
+        bricks[i].isLocked = true
+        bricks[i].tier = 0
+        bricks[i].color = 6
     end
 
     -- in the event we didn't generate any bricks, try again

@@ -9,15 +9,16 @@ function GenerateQuads(atlas, tilewidth, tileheight)
     local spritesheet = {}
 
     for y = 0, sheetHeight - 1 do
-        for x = 0, sheetWidth do
-            spritesheet[sheetCounter] = love.graphics.newQuad(x * tilewidth, y * tileheight, tilewidth, tileheight, atlas:getDimensions())
+        for x = 0, sheetWidth - 1 do
+            spritesheet[sheetCounter] =
+            love.graphics.newQuad(x * tilewidth, y * tileheight, tilewidth,
+                    tileheight, atlas:getDimensions())
             sheetCounter = sheetCounter + 1
         end
     end
 
     return spritesheet
 end
-
 -- takes a slice of the array (Table)
 function table.slice(tbl, first, last, step)
     local sliced = {}
@@ -36,7 +37,10 @@ end
     we have to return a subset of GenerateQuads.
 ]]
 function GenerateQuadsBricks(atlas)
-    return table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
+    local all = GenerateQuads(atlas, 32, 16)
+    local out = table.slice(all, 1, 21)
+    table.insert(out,all[24])
+    return out
 end
 
 

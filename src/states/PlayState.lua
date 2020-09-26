@@ -11,6 +11,8 @@ function PlayState:enter(params)
     self.pointsCounters = params.pointsCounters
 
     self.powerup = nil
+    self.key = nil
+    self.hasKey = params.hasKey
 
     -- give ball random starting velocity
     self.balls[1].dx = randomBallDx()
@@ -42,6 +44,13 @@ function PlayState:update(dt)
         self.powerup:update(dt)
         if self.powerup.y > VIRTUAL_HEIGHT then
             self.powerup = nil
+        end
+    end
+
+    if self.key then
+        self.key:update(dt)
+        if self.key.y > VIRTUAL_HEIGHT then
+            self.key = nil
         end
     end
 
@@ -77,20 +86,24 @@ function PlayState:update(dt)
                 self.score = self.score + (brick.tier * 200 + brick.color * 25)
                 self.pointsCounters.checkpoint = self.pointsCounters.checkpoint + (brick.tier * 200 + brick.color * 25)
                 self.pointsCounters.powerup = self.pointsCounters.powerup - 1
+                self.pointsCounters.key = self.pointsCounters.key - 1
 
                 if self.pointsCounters.checkpoint >= CHANGE_PADDLE_POINTS then
                     self.paddle:changeSize(self.paddle.size + 1)
                     self.pointsCounters.checkpoint = self.pointsCounters.checkpoint - CHANGE_PADDLE_POINTS
                 end
 
-                if self.pointsCounters.powerup >= 0 then
-                    self.pointsCounters.powerup = self.pointsCounters.powerup - 1
-                elseif self.powerup == nil then
+                if self.pointsCounters.powerup == 0 and self.powerup == nil then
                     self.pointsCounters.powerup = randomPowerupTime()
                     self.powerup = Powerup(4)
                 end
 
-                brick:hit()
+                if not self.hasKey and self.pointsCounters.key == 0 and self.key == nil then
+                    self.pointsCounters.key = randomKeyTime()
+                    self.key = Powerup(10)
+                end
+
+                brick:hit(self.hasKey)
 
                 if self:checkVictory() then
                     gSounds['victory']:play()
@@ -172,7 +185,13 @@ function PlayState:update(dt)
         table.insert(self.balls, ball2)
     end
 
-    -- delete any balls that go off screen
+    if self.key and self.key:collides(self.paddle) then
+        self.hasKey = true
+        self.key = nil
+    end
+
+
+        -- delete any balls that go off screen
     for k,ball in pairs(self.balls) do
         if ball.y >= VIRTUAL_HEIGHT then
             table.remove(self.balls,k)
@@ -198,7 +217,8 @@ function PlayState:update(dt)
                 score = self.score,
                 highScores = self.highScores,
                 level = self.level,
-                pointsCounters = self.pointsCounters
+                pointsCounters = self.pointsCounters,
+                hasKey = self.hasKey
             })
         end
 
@@ -236,6 +256,15 @@ function PlayState:render()
         self.powerup:render()
     end
 
+    if self.key then
+        self.key:render()
+    end
+
+    if self.hasKey then
+        local healthX = VIRTUAL_WIDTH - 120
+
+        love.graphics.draw(gTextures['main'], gFrames['powerups'][10], healthX, 5)
+    end
     renderScore(self.score)
     renderHealth(self.health)
 

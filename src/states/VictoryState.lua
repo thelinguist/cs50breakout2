@@ -31,16 +31,19 @@ function VictoryState:update(dt)
 
     -- go to play screen if the player presses Enter
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+        local lockedBrickFlag = randomLockLevel()
+
         gStateMachine:change('serve', {
             level = self.level + 1,
-            bricks = LevelMaker.createMap(self.level + 1),
+            bricks = LevelMaker.createMap(self.level + 1, lockedBrickFlag),
             paddle = self.paddle,
             health = self.health,
             score = self.score,
             highScores = self.highScores,
             pointsCounters = {
                 checkpoint = 0,
-                powerup = randomPowerupTime()
+                powerup = randomPowerupTime(),
+                key = lockedBrickFlag and  randomKeyTime() or -1
             }
         })
     end

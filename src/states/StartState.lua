@@ -35,16 +35,19 @@ function StartState:update(dt)
         gSounds['confirm']:play()
 
         if highlighted == 1 then
+            local lockedBrickFlag = randomLockLevel()
+
             gStateMachine:change('serve', {
                 paddle = Paddle(1),
-                bricks = LevelMaker.createMap(1),
+                bricks = LevelMaker.createMap(1, lockedBrickFlag),
                 health = 3,
                 score = 0,
                 highScores = self.highScores,
                 level = 1,
                 pointsCounters = {
                     checkpoint = 0,
-                    powerup = randomPowerupTime()
+                    powerup = randomPowerupTime(),
+                    key = lockedBrickFlag and  randomKeyTime() or -1
                 },
             })
         else
