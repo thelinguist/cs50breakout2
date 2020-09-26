@@ -285,6 +285,13 @@ function renderHealth(health)
     end
 end
 
+function renderKey(hasKey)
+    if hasKey then
+        local healthX = VIRTUAL_WIDTH - 120
+        love.graphics.draw(gTextures['main'], gFrames['powerups'][10], healthX, 5)
+    end
+end
+
 function renderScore(score)
     love.graphics.setFont(gFonts['small'])
     love.graphics.print('score:',VIRTUAL_WIDTH - 60, 5)

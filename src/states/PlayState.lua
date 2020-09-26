@@ -54,29 +54,7 @@ function PlayState:update(dt)
         end
     end
 
-    for k,ball in pairs(self.balls) do
-
-        if ball:collides(self.paddle) then
-            -- reverse Y velocity if collision detected between paddle and ball
-            ball.y = self.paddle.y - 8
-            ball.dy = -ball.dy
-
-            --
-            -- tweak angle of bounce based on where it hits the paddle
-            --
-
-            -- if we hit the paddle on its left side while moving left...
-            if ball.x < self.paddle.x + (self.paddle.width / 2) and self.paddle.dx < 0 then
-                ball.dx = -50 + -(8 * (self.paddle.x + self.paddle.width / 2 - ball.x))
-
-                -- else if we hit the paddle on its right side while moving right...
-            elseif ball.x > self.paddle.x + (self.paddle.width / 2) and self.paddle.dx > 0 then
-                ball.dx = 50 + (8 * math.abs(self.paddle.x + self.paddle.width / 2 - ball.x))
-            end
-
-            gSounds['paddle-hit']:play()
-        end
-    end
+    self:ballCollision()
 
     for k,brick in pairs(self.bricks) do
         for j,ball in pairs(self.balls) do
@@ -88,16 +66,19 @@ function PlayState:update(dt)
                 self.pointsCounters.powerup = self.pointsCounters.powerup - 1
                 self.pointsCounters.key = self.pointsCounters.key - 1
 
+                -- add paddle points
                 if self.pointsCounters.checkpoint >= CHANGE_PADDLE_POINTS then
                     self.paddle:changeSize(self.paddle.size + 1)
                     self.pointsCounters.checkpoint = self.pointsCounters.checkpoint - CHANGE_PADDLE_POINTS
                 end
 
+                -- add powerup points
                 if self.pointsCounters.powerup == 0 and self.powerup == nil then
                     self.pointsCounters.powerup = randomPowerupTime()
                     self.powerup = Powerup(4)
                 end
 
+                -- add key points
                 if not self.hasKey and self.pointsCounters.key == 0 and self.key == nil then
                     self.pointsCounters.key = randomKeyTime()
                     self.key = Powerup(10)
@@ -260,11 +241,7 @@ function PlayState:render()
         self.key:render()
     end
 
-    if self.hasKey then
-        local healthX = VIRTUAL_WIDTH - 120
-
-        love.graphics.draw(gTextures['main'], gFrames['powerups'][10], healthX, 5)
-    end
+    renderKey(self.hasKey)
     renderScore(self.score)
     renderHealth(self.health)
 
@@ -283,4 +260,28 @@ function PlayState:checkVictory()
     return true
 end
 
+function PlayState:ballCollision()
+    for k,ball in pairs(self.balls) do
 
+        if ball:collides(self.paddle) then
+            -- reverse Y velocity if collision detected between paddle and ball
+            ball.y = self.paddle.y - 8
+            ball.dy = -ball.dy
+
+            --
+            -- tweak angle of bounce based on where it hits the paddle
+            --
+
+            -- if we hit the paddle on its left side while moving left...
+            if ball.x < self.paddle.x + (self.paddle.width / 2) and self.paddle.dx < 0 then
+                ball.dx = -50 + -(8 * (self.paddle.x + self.paddle.width / 2 - ball.x))
+
+                -- else if we hit the paddle on its right side while moving right...
+            elseif ball.x > self.paddle.x + (self.paddle.width / 2) and self.paddle.dx > 0 then
+                ball.dx = 50 + (8 * math.abs(self.paddle.x + self.paddle.width / 2 - ball.x))
+            end
+
+            gSounds['paddle-hit']:play()
+        end
+    end
+end

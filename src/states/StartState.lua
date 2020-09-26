@@ -44,6 +44,7 @@ function StartState:update(dt)
                 score = 0,
                 highScores = self.highScores,
                 level = 1,
+                hasKey = false,
                 pointsCounters = {
                     checkpoint = 0,
                     powerup = randomPowerupTime(),

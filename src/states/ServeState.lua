@@ -53,6 +53,7 @@ function ServeState:render()
 
     renderScore(self.score)
     renderHealth(self.health)
+    renderKey(self.hasKey)
 
     if self.paused then
         love.graphics.setFont(gFonts['large'])
